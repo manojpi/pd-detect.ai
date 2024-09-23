@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
+import VoiceRecorder from './VoiceRecorder.Component';
 
 const ChatbotUI = () => {
   return (
@@ -19,7 +20,7 @@ const ChatbotUI = () => {
       </header>
 
       <main className="flex-grow flex flex-col items-center justify-center p-4">
-        <div className="bg--800 rounded-lg p-6 max-w-2xl w-full">
+        <div className="bg-800 rounded-lg p-6 max-w-2xl w-full">
           <h1 className="text-2xl font-bold mb-2">Take a Parkinson Disease Test</h1>
           <p className="text-gray-400 mb-4">
             ...
@@ -29,7 +30,9 @@ const ChatbotUI = () => {
           </p>
         </div>
 
-        <div className="mt-8 w-full max-w-2xl">
+        <VoiceRecorder/>
+
+        <div className="fixed bottom-4 mt-8 b-0 w-full max-w-3xl">
           <div className="bg-gray-800 p-4 rounded-lg flex items-center">
             <input
               type="text"

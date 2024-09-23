@@ -1,4 +1,5 @@
 import ChatbotUI from "../components/ChatBotUI.Component";
+import VoiceRecorder from "../components/VoiceRecorder.Component";
 
 const PdDetect = () => {
 
