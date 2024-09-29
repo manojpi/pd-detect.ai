@@ -1,6 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
-import VoiceRecorder from './VoiceRecorder.Component';
+import AudioRecorder from './AudioRecorder.Component';
 
 const ChatbotUI = () => {
   return (
@@ -30,7 +30,7 @@ const ChatbotUI = () => {
           </p>
         </div>
 
-        <VoiceRecorder/>
+        <AudioRecorder/>
 
         <div className="fixed bottom-4 mt-8 b-0 w-full max-w-3xl">
           <div className="bg-gray-800 p-4 rounded-lg flex items-center">
