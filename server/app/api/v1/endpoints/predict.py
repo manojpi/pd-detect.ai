@@ -13,3 +13,9 @@ async def predict_audio(audio: UploadFile = File(...)):
         file.write(audio_content)
     
     return {"filename": audio.filename}
+
+@router.get("/api/predict/test")
+async def predict_audio():
+
+    
+    return {"result": "Manoj"}
