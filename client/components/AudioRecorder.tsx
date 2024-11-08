@@ -4,9 +4,9 @@ const AudioRecorder = () => {
 
     const [isVoiceRecording, setIsVoiceRecording] = useState(false);
     const [bars, setBars] = useState(Array(50).fill(0));
-    const [mediaRecorder, setMediaRecorder] = useState(null);
-    const [audioChunks, setAudioChuncks] = useState([]);
-    const [audioBlob, setAudioBlob] = useState(null);
+    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+    const [audioChunks, setAudioChuncks] = useState<Blob[]>([]);
+    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
     useEffect(() => {
         if (navigator.mediaDevices) {
@@ -15,12 +15,12 @@ const AudioRecorder = () => {
                     const recorder = new MediaRecorder(stream);
                     setMediaRecorder(recorder);
                 })
-                .catch(error => console.error("Error in accessing microphone: ", err));
+                .catch(error => console.error("Error in accessing microphone: ", error));
         }
     }, [])
 
     useEffect(() => {
-        let intervalId;
+        let intervalId: ReturnType<typeof setInterval>;
         if (isVoiceRecording) {
             intervalId = setInterval(() => {
                 setBars(prevBars => prevBars.map(() => Math.random() * 100));
@@ -48,7 +48,7 @@ const AudioRecorder = () => {
         if (mediaRecorder) {
             setIsVoiceRecording(false);
             mediaRecorder.onstop = async () => {
-                const blob = new Blob(audioChunks, {type: 'audio/wav'});
+                const blob = new Blob(audioChunks, {type: 'audio/mp3'});
                 setAudioBlob(blob);
             }
             mediaRecorder.stop();
@@ -75,7 +75,7 @@ const AudioRecorder = () => {
     }
 
     return (
-        <div className="flex flex-col items-center p-4 bg-gray-900 rounded-lg">
+        <div className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg">
             <div className="w-full h-32 bg-black rounded-lg overflow-hidden flex items-end justify-center space-x-1 mb-4">
                 {
                     bars.map((height, index) => (
