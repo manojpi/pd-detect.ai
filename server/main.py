@@ -1,9 +1,10 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.routes import api_router
-import shutil
-import uvicorn
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from app.api.routes import api_router
 
 app = FastAPI()
 

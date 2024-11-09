@@ -1,15 +1,16 @@
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
-from ....services.audio_feature_extractor import *
+from ...services.audio_feature_extractor import *
 import pickle
 
-router = APIRouter()
+detect_router = APIRouter()
 
 linear_model_file = "../models/linear_model.pkl"
 with open(linear_model_file, 'rb') as model_file:
     linear_model = pickle.load(model_file)
 
-@router.post("/api/detect/audio/")
+
+@detect_router.post("/api/detect/audio/")
 async def predict_audio(audio: UploadFile = File(...)):
     
     if audio.content_type not in ["audio/wav", "audio/mp3", "audio/webm"]:
@@ -28,6 +29,4 @@ async def predict_audio(audio: UploadFile = File(...)):
     features = np.array(list(features.values())).reshape(1, -1)
     pd_result = linear_model.predict(features)
 
-
-    return {"message": f"Tested {"Positive" if pd_result[0] == 1 else "Negative"} for Parkinson Disease"}
-
+    return JSONResponse(status_code=200, content={"message": f"Tested {"Positive" if pd_result[0] == 1 else "Negative"} for Parkinson Disease"})

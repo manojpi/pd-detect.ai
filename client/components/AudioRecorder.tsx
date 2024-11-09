@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, Bolt } from "lucide-react";
+import { toast, useToast } from "@/hooks/use-toast";
 
 export default function AudioRecorder() {
 
@@ -8,6 +9,7 @@ export default function AudioRecorder() {
     const audioStreamRef = useRef<MediaStream | null>(null);
     const [audioURL, setAudioURL] = useState<string | null>(null);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+    const { toast } = useToast();
 
     const handleStartAudioRecording = async () => {
         try {
@@ -82,6 +84,10 @@ export default function AudioRecorder() {
                     return response.json();
                 }).then(data => {
                     console.log(data.message);
+                    toast({
+                        title: "Parkinson Disease Diagnosis",
+                        description: data.message
+                    })
                 });
             } catch (error) {
                 console.error('Error:', error);
@@ -90,13 +96,13 @@ export default function AudioRecorder() {
     }
 
     return (
-        <div className="mt-20 flex flex-col items-center">
-            <div onClick={handleMicClick} className="rounded-full w-48 h-48 flex flex-col justify-center items-center hover:cursor-pointer" style={{ backgroundColor: !isAudioRecording ? "rgb(253, 247, 247)" : "rgb(234, 93, 93)" }}>
+        <div className="mt-12 flex flex-col items-center">
+            <div onClick={handleMicClick} className="rounded-full w-44 h-44 flex flex-col justify-center items-center hover:cursor-pointer" style={{ backgroundColor: !isAudioRecording ? "rgb(253, 247, 247)" : "rgb(234, 93, 93)" }}>
                 <Mic size={150} strokeWidth={1.5} color={!isAudioRecording ? "rgb(234, 93, 93)" : "rgb(253, 247, 247)"} />
             </div>
 
             {audioURL && (
-                <div className="mt-14 flex flex-row items-center justify-normal">
+                <div className="mt-12 flex flex-row items-center justify-normal">
                     <audio className="w-30" controls src={audioURL} ></audio>
                     <button onClick={handleAudioSend} className="ml-5 w-12 h-12 rounded-full bg-slate-700 flex flex-col items-center justify-center  hover:bg-slate-500">
                         <Bolt size={35} color="#fdf7f7" strokeWidth={2.5} absoluteStrokeWidth />

@@ -10,8 +10,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <div className="h-screen w-screen flex flex-col">
+      <body className="bg-neutral-900">
+        <div className="h-screen w-screen flex flex-col overflow-scroll scrollbar scrollbar-thumb-neutral-700 scrollbar-track-neutral-900" >
           <Header/>
           <BotUI/>
           {children}
