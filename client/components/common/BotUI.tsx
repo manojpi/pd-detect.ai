@@ -19,12 +19,6 @@ const BotUI = () => {
                 </p>
             </div>
 
-            {/* <div className="mt-24">
-                <div>
-                <Mic size={150} color="#f1e4e4" />
-                </div>
-            </div> */}
-
             <AudioRecorder/>
 
             <div className="fixed bottom-9 mt-8 w-full max-w-3xl">

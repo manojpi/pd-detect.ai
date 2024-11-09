@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Mic, Bolt } from "lucide-react";
 
 export default function AudioRecorder() {
@@ -7,14 +7,15 @@ export default function AudioRecorder() {
     const audioRecorderRef = useRef<MediaRecorder | null>(null);
     const audioStreamRef = useRef<MediaStream | null>(null);
     const [audioURL, setAudioURL] = useState<string | null>(null);
+    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
     const handleStartAudioRecording = async () => {
         try {
-            const audioStream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true});
+            const audioStream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             audioStreamRef.current = audioStream;
-            
+
             // creating a MediaRecorder Instance
-            const audioRecorder = new MediaRecorder(audioStream);
+            const audioRecorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm'});
             audioRecorderRef.current = audioRecorder;
 
             // store audio data chunks
@@ -29,9 +30,10 @@ export default function AudioRecorder() {
 
             // on stoping the audio recorder
             audioRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks);
-                const url = URL.createObjectURL(audioBlob);
+                const currentAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const url = URL.createObjectURL(currentAudioBlob);
                 setAudioURL(url);
+                setAudioBlob(currentAudioBlob);
             }
 
             // start recording
@@ -65,6 +67,26 @@ export default function AudioRecorder() {
         }
     }
 
+    const handleAudioSend = async () => {
+        const formData = new FormData();
+        if (audioBlob) {
+            formData.append('audio', audioBlob, 'recording.webm');
+            try {
+                const response = await fetch('http://localhost:8000/api/detect/audio/', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    console.log('Audio uploaded successfully');
+                } else {
+                    console.error('Error uploading audio:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    }
+
     return (
         <div className="mt-20 flex flex-col items-center">
             <div onClick={handleMicClick} className="rounded-full w-48 h-48 flex flex-col justify-center items-center hover:cursor-pointer" style={{ backgroundColor: !isAudioRecording ? "rgb(253, 247, 247)" : "rgb(234, 93, 93)" }}>
@@ -72,11 +94,11 @@ export default function AudioRecorder() {
             </div>
 
             {audioURL && (
-                <div className="mt-14 flex flex-row items-center justify-normal"> 
+                <div className="mt-14 flex flex-row items-center justify-normal">
                     <audio className="w-30" controls src={audioURL} ></audio>
-                    <button className="ml-5 w-12 h-12 rounded-full bg-slate-700 flex flex-col items-center justify-center  hover:bg-slate-500">
+                    <button onClick={handleAudioSend} className="ml-5 w-12 h-12 rounded-full bg-slate-700 flex flex-col items-center justify-center  hover:bg-slate-500">
                         <Bolt size={35} color="#fdf7f7" strokeWidth={2.5} absoluteStrokeWidth />
-                    </button>   
+                    </button>
                 </div>
             )}
 
