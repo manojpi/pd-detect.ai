@@ -1,7 +1,7 @@
-import Footer from "@/components/layout/Footer";
+import Footer from "@/components/common/Footer";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import BotUI from "@/components/layout/BotUI";
+import Header from "@/components/common/Header";
+import BotUI from "@/components/common/BotUI";
 
 export default function RootLayout({
   children,

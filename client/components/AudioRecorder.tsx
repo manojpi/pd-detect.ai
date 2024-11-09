@@ -1,113 +1,85 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
+import { Mic, Bolt } from "lucide-react";
 
-const AudioRecorder = () => {
+export default function AudioRecorder() {
 
-    const [isVoiceRecording, setIsVoiceRecording] = useState(false);
-    const [bars, setBars] = useState(Array(50).fill(0));
-    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-    const [audioChunks, setAudioChuncks] = useState<Blob[]>([]);
-    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+    const [isAudioRecording, setIsAudioRecording] = useState(false);
+    const audioRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioStreamRef = useRef<MediaStream | null>(null);
+    const [audioURL, setAudioURL] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (navigator.mediaDevices) {
-            navigator.mediaDevices.getUserMedia({ audio: true})
-                .then(stream => {
-                    const recorder = new MediaRecorder(stream);
-                    setMediaRecorder(recorder);
-                })
-                .catch(error => console.error("Error in accessing microphone: ", error));
-        }
-    }, [])
+    const handleStartAudioRecording = async () => {
+        try {
+            const audioStream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true});
+            audioStreamRef.current = audioStream;
+            
+            // creating a MediaRecorder Instance
+            const audioRecorder = new MediaRecorder(audioStream);
+            audioRecorderRef.current = audioRecorder;
 
-    useEffect(() => {
-        let intervalId: ReturnType<typeof setInterval>;
-        if (isVoiceRecording) {
-            intervalId = setInterval(() => {
-                setBars(prevBars => prevBars.map(() => Math.random() * 100));
-            }, 100);
-        }
-        return () => clearInterval(intervalId);
-    }, [isVoiceRecording]);
+            // store audio data chunks
+            const audioChunks: Blob[] = [];
 
-    const startAudioRecording = async () => {
-
-        // reset the old audio chunks and blobs
-        await setAudioBlob(null);
-        await setAudioChuncks([])
-        if (mediaRecorder) {
-            setIsVoiceRecording(true);
-            mediaRecorder.start();
-            mediaRecorder.ondataavailable = (event) => {
-                setAudioChuncks((prev) => [...prev, event.data]);
-            };
-        }
-    };
-
-    const stopAudioRecording = async () => {
-
-        if (mediaRecorder) {
-            setIsVoiceRecording(false);
-            mediaRecorder.onstop = async () => {
-                const blob = new Blob(audioChunks, {type: 'audio/mp3'});
-                setAudioBlob(blob);
+            // on data available, push the data to chunks array
+            audioRecorder.ondataavailable = (event: BlobEvent) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
             }
-            mediaRecorder.stop();
+
+            // on stoping the audio recorder
+            audioRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks);
+                const url = URL.createObjectURL(audioBlob);
+                setAudioURL(url);
+            }
+
+            // start recording
+            audioRecorder.start();
+            setIsAudioRecording(true);
+        } catch (error) {
+            console.error('Error accessing user audio:', error);
         }
     }
 
-    const handleSendAudio = async () => {
-        if (audioBlob) {
-            const formData = new FormData();
-            formData.append('audio', audioBlob, 'recording.wav');
+    const handleStopAudioRecording = async () => {
 
-            const audio = new Audio(window.URL.createObjectURL(audioBlob)); // await new Audio(window.URL.createObjectURL(audioBlob)) does not work
+        if (audioRecorderRef.current) {
+            audioRecorderRef.current.stop(); // stops the audio recording process and calls ondataavialable
+        }
 
-            try {
-                const response = await fetch('http://localhost:8085/api/predict/audio/', {
-                    method: 'POST',
-                    body: formData,
-                });
+        if (audioStreamRef.current) {
+            // stops all the media tracks, actual recording stop
+            audioStreamRef.current.getTracks().forEach((track) => track.stop());
+            audioStreamRef.current = null;
+        }
 
-            } catch (error) {
-                console.error('Error sending audio: ', error)
-            }
+        setIsAudioRecording(false);
+    }
+
+    const handleMicClick = async () => {
+        if (isAudioRecording) {
+            handleStopAudioRecording();
+        } else {
+            handleStartAudioRecording();
         }
     }
 
     return (
-        <div className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg">
-            <div className="w-full h-32 bg-black rounded-lg overflow-hidden flex items-end justify-center space-x-1 mb-4">
-                {
-                    bars.map((height, index) => (
-                        <div
-                        key={index}
-                        className="w-1 bg-blue-500 transition-all duration-100 ease-out"
-                        style={{height: `${height}%`}}
-                        ></div>
-                    ))
-                }
-
+        <div className="mt-20 flex flex-col items-center">
+            <div onClick={handleMicClick} className="rounded-full w-48 h-48 flex flex-col justify-center items-center hover:cursor-pointer" style={{ backgroundColor: !isAudioRecording ? "rgb(253, 247, 247)" : "rgb(234, 93, 93)" }}>
+                <Mic size={150} strokeWidth={1.5} color={!isAudioRecording ? "rgb(234, 93, 93)" : "rgb(253, 247, 247)"} />
             </div>
-            <button
-            onClick={startAudioRecording}
-            className = {"px-4 py-2 rounded-full font-bold bg-blue-500 text-white hover:bg-red-500 text-white"}>
-                Start Recording
-            </button>
 
-            <button
-            onClick={stopAudioRecording}
-            className = {"px-4 py-2 rounded-full font-bold bg-blue-500 text-white hover:bg-red-500 text-white"}>
-                Stop Recording
-            </button>
-
-            <button
-            onClick={handleSendAudio}
-            className = {"px-4 py-2 rounded-full font-bold bg-blue-500 text-white hover:bg-red-500 text-white"}>
-                Detech Parkinson Disease
-            </button>
+            {audioURL && (
+                <div className="mt-14 flex flex-row items-center justify-normal"> 
+                    <audio className="w-30" controls src={audioURL} ></audio>
+                    <button className="ml-5 w-12 h-12 rounded-full bg-slate-700 flex flex-col items-center justify-center  hover:bg-slate-500">
+                        <Bolt size={35} color="#fdf7f7" strokeWidth={2.5} absoluteStrokeWidth />
+                    </button>   
+                </div>
+            )}
 
         </div>
     )
 }
-
-export default AudioRecorder;

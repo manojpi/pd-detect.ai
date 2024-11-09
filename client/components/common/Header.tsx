@@ -1,6 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
-import { BrainCog } from 'lucide-react';
+import { BrainCog, Biohazard } from 'lucide-react';
 
 const Header = () => {
   return (
@@ -17,8 +17,8 @@ const Header = () => {
         <div className="flex items-center space-x-4">
 
           <button className="flex items-center space-x-1 bg-white text-gray-900 px-3 py-1 rounded">
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+            <span>Manoj</span>
+            <Biohazard className="w-4 h-4" />
           </button>
         </div>
       </header>
