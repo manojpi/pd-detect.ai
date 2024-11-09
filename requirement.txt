@@ -7,3 +7,4 @@ noisereduce==3.0.2
 uvicorn==0.14.0
 python-multipart==0.0.10
 praat-parselmouth==0.4.5
+ffmpeg==1.4

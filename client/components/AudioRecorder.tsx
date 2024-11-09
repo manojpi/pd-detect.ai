@@ -70,17 +70,19 @@ export default function AudioRecorder() {
     const handleAudioSend = async () => {
         const formData = new FormData();
         if (audioBlob) {
-            formData.append('audio', audioBlob, 'recording.webm');
+            formData.append('audio', audioBlob, 'recording.webm'); ///webp is better for compatibility
             try {
                 const response = await fetch('http://localhost:8000/api/detect/audio/', {
                     method: 'POST',
                     body: formData
+                }).then( response => {
+                    if (!response.ok) {
+                        console.error('Error uploading audio:', response.statusText);
+                    }
+                    return response.json();
+                }).then(data => {
+                    console.log(data.message);
                 });
-                if (response.ok) {
-                    console.log('Audio uploaded successfully');
-                } else {
-                    console.error('Error uploading audio:', response.statusText);
-                }
             } catch (error) {
                 console.error('Error:', error);
             }
