@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import AudioRecorder from '../AudioRecorder';
 import { Toaster } from "../ui/toaster";
 import ChatBox from './ChatBox';
-import { CircleUser } from 'lucide-react';
 
 const BotUI = () => {
 
@@ -22,8 +21,8 @@ const BotUI = () => {
                 <AudioRecorder/>
                 <Toaster/>
 
-                <div id="chat-content" className='mt-11 mb-10 w-full h-full max-w-4xl overflow-hidden'>
-    
+                <div id="chat-content" className='mt-11 mb-16 w-full h-full max-w-3xl overflow-hidden'>
+
                 </div>
                 <ChatBox/>
                 </div>

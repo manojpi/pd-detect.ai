@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { SendHorizontal } from "lucide-react";
+import { SendHorizontal, Bot } from "lucide-react";
 
 
 export default function ChatBox() {
@@ -10,7 +10,7 @@ export default function ChatBox() {
         messageElement.className = '';
     }
 
-    const userPromptAdder  = (userQuery: string) => {
+    const userPromptAdder = (userQuery: string) => {
 
         const chat_content_id = "chat-content"
         const newUserQueryElement = document.createElement("div")
@@ -25,17 +25,26 @@ export default function ChatBox() {
 
     const llmResponseAdder = (llmResponse: string) => {
         const chat_content_id = "chat-content"
-        const newLLMResponseElement = document.createElement("div")
+        const newLLMResponseContainer = document.createElement("div")
         const newLLMResponseContent = document.createElement("p")
-        newLLMResponseContent.innerHTML = llmResponse
-        newLLMResponseElement.className = "w-full mb-8 rounded-lg  bg-neutral-800 text-gray-400 p-4 text-right"
-        newLLMResponseElement.appendChild(newLLMResponseContent)
+        const botIcon = document.createElement("i")
+        botIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" 
+                            stroke="#fafafa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot">
+                            <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/>
+                            <path d="M15 13v2"/><path d="M9 13v2"/></svg>`
 
-        document.getElementById(chat_content_id)?.appendChild(newLLMResponseElement)
+        newLLMResponseContent.innerHTML = llmResponse;
+        newLLMResponseContent.className = "w-full mb-8 rounded-lg  bg-neutral-800 text-gray-400 p-4 text-left";
+        newLLMResponseContainer.className = "flex space-x-4"
+        
+        newLLMResponseContainer.appendChild(botIcon);
+        newLLMResponseContainer.appendChild(newLLMResponseContent);
+
+        document.getElementById(chat_content_id)?.appendChild(newLLMResponseContainer)
     }
 
     const handleAskBtn = async () => {
-        
+
         const query = {
             prompt: prompt
         }
@@ -51,7 +60,7 @@ export default function ChatBox() {
         }).then(
             response => response.json()
         ).then(data => data.message);
-        
+
         console.log(llmResponse);
         llmResponseAdder(llmResponse);
     }
