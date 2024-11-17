@@ -66,7 +66,7 @@ export default function ChatBox() {
     }
 
     return (
-        <div className="w-screen max-w-screen-2xl bg-neutral-900 fixed bottom-9 pt-4 flex flex-col items-center justify-center">
+        <div className="w-screen max-w-screen-xl bg-neutral-900 fixed bottom-9 pt-4 flex flex-col items-center justify-center">
             <div className="w-full max-w-screen-md min-w-screen-md bg-neutral-800 rounded-lg flex items-center p-3">
                 <input
                     type="text"

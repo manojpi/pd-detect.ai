@@ -9,3 +9,4 @@ python-multipart==0.0.10
 praat-parselmouth==0.4.5
 ffmpeg==1.4
 langchain==0.3.1
+peft==0.13.2
